@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#05090c" />
+    <title>Solar Observatory — Orbital Explorer</title>
+    <meta
+      name="description"
+      content="Explore eight planets, the Moon, and a local catalogue of real asteroid orbits in an interactive 3D solar system."
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three.module.js" } }
+    </script>
+  </head>
+  <body>
+    <main id="universe" aria-label="Interactive 3D solar system"></main>
+    <header>
+      <a class="brand" href="./" aria-label="Solar Observatory home"
+        ><span class="mark" data-icon="orbit"></span> SOLAR
+        <span>OBSERVATORY</span></a
+      >
+      <div class="live"><i></i> ORBITAL SIMULATION</div>
+      <div class="header-actions">
+        <button
+          id="explore-toggle"
+          aria-controls="catalog"
+          aria-expanded="true"
+        >
+          <span data-icon="menu"></span><span>Explore</span>
+        </button>
+        <button
+          id="settings"
+          aria-controls="control-panel"
+          aria-expanded="false"
+        >
+          <span data-icon="sliders"></span><span>Controls</span>
+        </button>
+      </div>
+    </header>
+    <aside id="catalog" aria-label="Explore objects">
+      <div class="eyebrow">EXPLORE THE SOLAR SYSTEM</div>
+      <h1>A universe in motion.</h1>
+      <p class="intro">
+        Our celestial neighborhood, from a different perspective.
+      </p>
+      <label class="search"
+        ><span data-icon="search"></span
+        ><input
+          id="search"
+          placeholder="Find a planet or asteroid…"
+          autocomplete="off"
+          aria-label="Find a planet or asteroid"
+        /><kbd>/</kbd></label
+      >
+      <div class="tabs" role="group" aria-label="Object category">
+        <button class="active" data-tab="planets" aria-pressed="true">
+          Planets & Moon</button
+        ><button data-tab="asteroids" aria-pressed="false">Asteroids</button>
+      </div>
+      <div id="objects"></div>
+      <div id="result-summary" aria-live="polite"></div>
+      <div class="catalog-foot">
+        <i></i><span id="count">Loading orbital catalogue</span
+        ><button id="about" aria-label="About the observatory" title="About">
+          <span data-icon="info"></span>
+        </button>
+      </div>
+    </aside>
+    <section id="control-panel" hidden aria-label="Display controls">
+      <div class="eyebrow">DISPLAY & SIMULATION</div>
+      <label
+        >Asteroid brightness
+        <input
+          id="brightness"
+          type="range"
+          min="0.1"
+          max="2.5"
+          step="0.1"
+          value="1"
+      /></label>
+      <label
+        ><span>Planetary orbits</span
+        ><input id="orbits" type="checkbox" checked
+      /></label>
+      <label
+        ><span>Asteroid field</span
+        ><input id="asteroids" type="checkbox" checked
+      /></label>
+      <label
+        ><span>Milky Way background</span
+        ><input id="sky" type="checkbox" checked
+      /></label>
+      <label
+        ><span>Object labels</span><input id="labels" type="checkbox" checked
+      /></label>
+      <div class="panel-actions">
+        <button id="top"><span data-icon="layers"></span>Top view</button
+        ><button id="reset"><span data-icon="reset"></span>Reset view</button>
+      </div>
+    </section>
+    <div id="labels-layer" aria-hidden="true"></div>
+    <div class="view-meta">
+      <button
+        id="focus-toggle"
+        aria-controls="details"
+        aria-expanded="false"
+        title="Object information"
+      >
+        <span data-icon="target"></span
+        ><span class="focus-copy"
+          ><span class="eyebrow" id="view-kind">HELIOCENTRIC VIEW</span
+          ><span id="focus-name">Solar system</span></span
+        ><span class="focus-chevron" data-icon="down"></span>
+      </button>
+      <section id="details" hidden aria-label="Object information"></section>
+    </div>
+    <div class="view-tools" role="group" aria-label="Camera controls">
+      <button id="zoom-in" aria-label="Zoom in" title="Zoom in">
+        <span data-icon="plus"></span>
+      </button>
+      <button id="zoom-out" aria-label="Zoom out" title="Zoom out">
+        <span data-icon="minus"></span>
+      </button>
+      <button id="home" aria-label="Reset view" title="Reset view">
+        <span data-icon="home"></span>
+      </button>
+      <button
+        id="fullscreen"
+        aria-label="Enter fullscreen"
+        title="Fullscreen (F)"
+      >
+        <span data-icon="expand"></span>
+      </button>
+    </div>
+    <footer>
+      <div class="time-controls">
+        <button id="play" aria-label="Pause simulation" title="Pause (Space)">
+          <span data-icon="pause"></span>
+        </button>
+        <div class="date-control">
+          <label for="date" class="eyebrow">SIMULATION DATE · UTC</label
+          ><input
+            type="date"
+            id="date"
+            min="1800-01-01"
+            max="2200-12-31"
+            aria-label="Simulation date"
+          />
+        </div>
+        <span class="divider"></span>
+        <div class="speed-controls">
+          <button id="slower" aria-label="Slower" title="Slower">
+            <span data-icon="left"></span></button
+          ><button id="speed" title="Cycle simulation speed">
+            30 days / sec</button
+          ><button id="faster" aria-label="Faster" title="Faster">
+            <span data-icon="right"></span>
+          </button>
+        </div>
+        <button id="now" title="Return to today's date">
+          <span data-icon="reset"></span><span>Today</span>
+        </button>
+      </div>
+      <div class="hints">
+        Drag to orbit <span>·</span> Scroll to zoom <span>·</span> Right drag to
+        pan
+      </div>
+    </footer>
+    <div
+      id="modal"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="about-title"
+    >
+      <article>
+        <button id="close-modal" aria-label="Close about">
+          <span data-icon="close"></span>
+        </button>
+        <div class="eyebrow">BEHIND THE OBSERVATORY</div>
+        <h2 id="about-title">Real orbits. A wider perspective.</h2>
+        <p>
+          Built with Three.js and a GPU Kepler solver, inspired by Ian Webster’s
+          Asterank. The asteroid catalogue is a bundled snapshot; planetary
+          orbits use approximate J2000 elements. The Moon uses a locally bundled
+          Astronomy Engine ephemeris.
+        </p>
+        <p>
+          Distances use astronomical units. Overview markers are enlarged for
+          visibility; local Earth–Moon views use physical radii. Glow is
+          artistic, not measured apparent brightness. Two-body asteroid and
+          planet paths omit gravitational perturbations.
+        </p>
+        <p>
+          Earth’s spin follows simulation time. The Moon approximately keeps its
+          near side toward Earth. High playback speeds are suited to orbital
+          exploration; slow time to examine surface rotation.
+        </p>
+        <p>
+          Drag to orbit, pinch or scroll to zoom, and use two fingers or
+          right-drag to pan. All orbital calculations and visual assets run
+          locally after loading.
+        </p>
+        <a href="https://www.asterank.com/3d/" target="_blank" rel="noreferrer"
+          >Original Asterank visualization</a
+        >
+      </article>
+    </div>
+    <div id="loading" role="status">INITIALIZING ORBITAL SYSTEM…</div>
+    <noscript
+      ><p class="fallback">
+        Enable JavaScript to explore the 3D solar system.
+      </p></noscript
+    >
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
