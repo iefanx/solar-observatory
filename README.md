@@ -29,7 +29,18 @@ The complete static website is in `dist/`. Rendering modules, data, textures, an
 
 ## Deployment
 
-GitHub Actions runs syntax checks and regression tests on pushes and pull requests to `main`. Successful pushes to `main` publish `dist/` to GitHub Pages. The workflow can also be run manually. Only `dist/` is published; tests and research notes remain in the repository.
+The `main` branch holds the complete project. GitHub Pages publishes the dedicated `gh-pages` branch, whose root contains only the static website from `dist/`. The optional **Regression checks** GitHub Actions workflow can be run manually.
+
+To publish a future update after committing it to `main`:
+
+```sh
+npm run check
+npm test
+git push origin main
+git subtree push --prefix dist origin gh-pages
+```
+
+GitHub Pages rebuilds after the `gh-pages` push. Tests and research notes are not included in the published website.
 
 ## Data and accuracy
 
