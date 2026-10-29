@@ -87,6 +87,7 @@ test("all referenced local application modules and image assets exist", () => {
     "icons.js",
     "orbital-math.js",
     "view-state.js",
+    "glow-texture.js",
     "style.css",
     "vendor/three.module.js",
     "vendor/OrbitControls.js",

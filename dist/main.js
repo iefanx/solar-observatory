@@ -1,4 +1,5 @@
 import * as T from "three";
+import { glowPixels } from "./glow-texture.js";
 import { cameraOffset, placeLabels } from "./view-state.js";
 import { keplerPosition } from "./orbital-math.js";
 import { icon, hydrateIcons } from "./icons.js";
@@ -267,18 +268,20 @@ function orbit(o, color, opacity = 0.3) {
   return line;
 }
 function glowTexture() {
-  const c = document.createElement("canvas");
-  c.width = c.height = 128;
-  const ctx = c.getContext("2d"),
-    g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-  g.addColorStop(0, "#fff");
-  g.addColorStop(0.06, "#fff");
-  g.addColorStop(0.16, "#ffffffae");
-  g.addColorStop(0.35, "#ffffff25");
-  g.addColorStop(1, "#ffffff00");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 128, 128);
-  return new T.CanvasTexture(c);
+  const texture = new T.DataTexture(
+    glowPixels(128),
+    128,
+    128,
+    T.RGBAFormat,
+    T.UnsignedByteType,
+  );
+  texture.minFilter = T.LinearFilter;
+  texture.magFilter = T.LinearFilter;
+  texture.generateMipmaps = false;
+  texture.premultiplyAlpha = false;
+  texture.colorSpace = T.NoColorSpace;
+  texture.needsUpdate = true;
+  return texture;
 }
 const glow = glowTexture();
 function sprite(color, size) {

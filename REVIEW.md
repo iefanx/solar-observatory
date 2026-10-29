@@ -25,3 +25,9 @@ Additional fixes: the sky follows the camera to remove background parallax when 
 Seven regression tests pass, including 1, 10, and 100 day/second tracking. Browser checks confirmed Earth selects one day per second, details stay collapsed, the closer framing settles, and no console warnings/errors were observed. The cross-device browser-matrix limit above still applies.
 
 The close-view visual check also exposed distant Sun/sky depth artifacts. The renderer now uses logarithmic depth, including matching chunks in the custom asteroid shaders; the sky renders first without writing/testing depth. Rechecked the artifact-producing 2027-06-22 Earth close view: jagged Sun artifacts were absent and the GPU shader console was clean. This was verified visually rather than inferred from orbital unit tests.
+
+## Safari glow review — 2026-10-29
+
+Replaced the Canvas2D radial-gradient upload with an explicit neutral-RGB RGBA DataTexture. Alpha retains the original radial profile; filtering, mipmap behavior, color space, and alpha premultiplication are explicit. This removes the browser-dependent canvas conversion path implicated by the colored Sun speckles without changing browser privacy/security settings or adding user-agent detection.
+
+Native macOS Safari verification: local catalogue loaded; Sun glow was clean at normal and enlarged zoom; selecting Earth set one day per second; Moon tracking and expandable details displayed the expected orbital values. Nine regression tests pass, including new deterministic/symmetric glow alpha and neutral-RGB checks. These tests do not replace a physical iOS or full GPU/browser matrix. A separate clean local port was used because the usual localhost preview origin had a service worker from an unrelated project.

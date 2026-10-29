@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 5173 --directory dist",
-    "check": "node --check dist/main.js && node --check dist/icons.js && node --check dist/orbital-math.js && node --check dist/view-state.js",
+    "check": "node --check dist/main.js && node --check dist/icons.js && node --check dist/orbital-math.js && node --check dist/view-state.js && node --check dist/glow-texture.js",
     "test": "node --test tests/*.test.mjs"
   }
 }
