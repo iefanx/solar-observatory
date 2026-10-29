@@ -34,6 +34,7 @@ The `main` branch holds the complete project. GitHub Pages publishes the dedicat
 To publish a future update after committing it to `main`:
 
 ```sh
+npm run prepare:pwa
 npm run check
 npm test
 git push origin main
@@ -58,3 +59,16 @@ This is an educational visualization, not a precision navigation ephemeris. Two-
 - Original Asterank asteroid sprite retained as a reference asset; the active renderer uses custom Gaussian sprites.
 
 See [REVIEW.md](REVIEW.md) for verification details and remaining cross-device testing limits.
+
+
+## Install and offline use
+
+The site is an installable Progressive Web App. Use the browser's install command (or **Install app** in View settings when offered). On iPhone/iPad, use **Share → Add to Home Screen**. App icons and standalone launch metadata are bundled locally.
+
+Open the website online once and wait for **Ready for offline use** in View settings. The complete orbital catalogue, simulation modules, and textures are then cached. Offline availability depends on browser storage being retained; clearing site data or browser storage eviction removes the offline copy.
+
+New releases download into a separate versioned cache. When available, **Update app** in View settings applies the update and reloads. Updates do not interrupt an active simulation automatically. Cache cleanup is scoped to this application's path and leaves other sites/apps alone.
+
+After changing any file in `dist/`, run `npm run prepare:pwa`, then the checks/tests and deployment commands above. The release check rejects a stale offline cache manifest. The generated `dist/sw.js` must be committed with the changed assets.
+
+The fullscreen control enters an immersive scene: all bars, panels, and camera controls hide, leaving one exit button. Native fullscreen is attempted when supported; the immersive layout also works where native fullscreen is unavailable. Escape or the exit button restores normal controls.

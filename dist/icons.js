@@ -12,6 +12,7 @@ const paths = {
   minus: '<path d="M5 12h14"/>',
   home: '<path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8"/>',
   expand: '<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
+  collapse: '<path d="M3 8h5V3m8 0v5h5M8 21v-5H3m18 0h-5v5"/>',
   pause: '<path d="M8 5v14M16 5v14"/>',
   play: '<path d="m8 4 12 8-12 8Z"/>',
   left: '<path d="m14 6-6 6 6 6"/>',

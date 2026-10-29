@@ -7,12 +7,20 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <meta name="theme-color" content="#05090c" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="app-icons/icon-180.png" />
+    <link rel="icon" type="image/png" href="app-icons/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <title>Solar Observatory — Orbital Explorer</title>
     <meta
       name="description"
       content="Explore eight planets, the Moon, and a local catalogue of real asteroid orbits in an interactive 3D solar system."
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20261029-panels1" />
     <script type="importmap">
       { "imports": { "three": "./vendor/three.module.js" } }
     </script>
@@ -43,7 +51,16 @@
       </div>
     </header>
     <aside id="catalog" aria-label="Explore objects">
-      <div class="eyebrow">EXPLORE THE SOLAR SYSTEM</div>
+      <div class="panel-heading">
+        <span class="eyebrow">YOUR SOLAR SYSTEM</span
+        ><button
+          id="close-explore"
+          class="panel-close"
+          aria-label="Close explore"
+        >
+          <span data-icon="close"></span>
+        </button>
+      </div>
       <h1>A universe in motion.</h1>
       <p class="intro">
         Our celestial neighborhood, from a different perspective.
@@ -72,35 +89,91 @@
       </div>
     </aside>
     <section id="control-panel" hidden aria-label="Display controls">
-      <div class="eyebrow">DISPLAY & SIMULATION</div>
-      <label
-        >Asteroid brightness
-        <input
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">MAKE IT YOURS</span>
+          <h2>View settings</h2>
+        </div>
+        <button
+          id="close-controls"
+          class="panel-close"
+          aria-label="Close controls"
+        >
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <div class="brightness-control">
+        <label for="brightness">Asteroid glow</label
+        ><output id="brightness-value" for="brightness">1.0×</output
+        ><input
           id="brightness"
           type="range"
           min="0.1"
           max="2.5"
           step="0.1"
           value="1"
-      /></label>
-      <label
-        ><span>Planetary orbits</span
-        ><input id="orbits" type="checkbox" checked
-      /></label>
-      <label
-        ><span>Asteroid field</span
-        ><input id="asteroids" type="checkbox" checked
-      /></label>
-      <label
-        ><span>Milky Way background</span
-        ><input id="sky" type="checkbox" checked
-      /></label>
-      <label
-        ><span>Object labels</span><input id="labels" type="checkbox" checked
-      /></label>
+          aria-label="Asteroid brightness"
+        />
+        <div class="range-hints"><span>Subtle</span><span>Bright</span></div>
+      </div>
+      <div class="settings-group">
+        <span class="eyebrow">SCENE LAYERS</span>
+        <label class="setting-row"
+          ><span class="setting-icon" data-icon="orbit"></span
+          ><span class="setting-copy"
+            ><span>Planetary orbits</span
+            ><small>Paths around the Sun</small></span
+          ><input
+            id="orbits"
+            type="checkbox"
+            checked
+            role="switch"
+            aria-label="Planetary orbits"
+        /></label>
+        <label class="setting-row"
+          ><span class="setting-icon" data-icon="layers"></span
+          ><span class="setting-copy"
+            ><span>Asteroid field</span
+            ><small>Real orbital catalogue</small></span
+          ><input
+            id="asteroids"
+            type="checkbox"
+            checked
+            role="switch"
+            aria-label="Asteroid field"
+        /></label>
+        <label class="setting-row"
+          ><span class="setting-icon" data-icon="sun"></span
+          ><span class="setting-copy"
+            ><span>Milky Way background</span
+            ><small>A wider perspective</small></span
+          ><input
+            id="sky"
+            type="checkbox"
+            checked
+            role="switch"
+            aria-label="Milky Way background"
+        /></label>
+        <label class="setting-row"
+          ><span class="setting-icon" data-icon="info"></span
+          ><span class="setting-copy"
+            ><span>Object labels</span><small>Names in the scene</small></span
+          ><input
+            id="labels"
+            type="checkbox"
+            checked
+            role="switch"
+            aria-label="Object labels"
+        /></label>
+      </div>
       <div class="panel-actions">
         <button id="top"><span data-icon="layers"></span>Top view</button
         ><button id="reset"><span data-icon="reset"></span>Reset view</button>
+      </div>
+      <div class="app-controls">
+        <span id="offline-status" role="status">Preparing offline access</span
+        ><button id="install-app" hidden>Install app</button
+        ><button id="update-app" hidden>Update app</button>
       </div>
     </section>
     <div id="labels-layer" aria-hidden="true"></div>
@@ -131,12 +204,20 @@
       </button>
       <button
         id="fullscreen"
-        aria-label="Enter fullscreen"
-        title="Fullscreen (F)"
+        aria-label="Enter immersive fullscreen"
+        title="Immersive fullscreen (F)"
       >
         <span data-icon="expand"></span>
       </button>
     </div>
+    <button
+      id="exit-immersive"
+      hidden
+      aria-label="Exit immersive fullscreen"
+      title="Exit fullscreen (Esc)"
+    >
+      <span data-icon="collapse"></span><span>Exit view</span>
+    </button>
     <footer>
       <div class="time-controls">
         <button id="play" aria-label="Pause simulation" title="Pause (Space)">
@@ -206,6 +287,11 @@
           right-drag to pan. All orbital calculations and visual assets run
           locally after loading.
         </p>
+        <p>
+          Install from your browser’s app menu. On iPhone or iPad, use Share →
+          Add to Home Screen. Offline use becomes available after the first
+          complete download; see View settings for status.
+        </p>
         <a href="https://www.asterank.com/3d/" target="_blank" rel="noreferrer"
           >Original Asterank visualization</a
         >
@@ -217,6 +303,7 @@
         Enable JavaScript to explore the 3D solar system.
       </p></noscript
     >
-    <script type="module" src="main.js?v=20261029-glow1"></script>
+    <script type="module" src="main.js?v=20261029-panels1"></script>
+    <script type="module" src="pwa.js"></script>
   </body>
 </html>

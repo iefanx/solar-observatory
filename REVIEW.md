@@ -31,3 +31,14 @@ The close-view visual check also exposed distant Sun/sky depth artifacts. The re
 Replaced the Canvas2D radial-gradient upload with an explicit neutral-RGB RGBA DataTexture. Alpha retains the original radial profile; filtering, mipmap behavior, color space, and alpha premultiplication are explicit. This removes the browser-dependent canvas conversion path implicated by the colored Sun speckles without changing browser privacy/security settings or adding user-agent detection.
 
 Native macOS Safari verification: local catalogue loaded; Sun glow was clean at normal and enlarged zoom; selecting Earth set one day per second; Moon tracking and expandable details displayed the expected orbital values. Nine regression tests pass, including new deterministic/symmetric glow alpha and neutral-RGB checks. These tests do not replace a physical iOS or full GPU/browser matrix. A separate clean local port was used because the usual localhost preview origin had a service worker from an unrelated project.
+
+
+## Panel and PWA release — 2026-10-29
+
+Restored the original open Explore styling as the common panel language after design feedback. Controls and object details use the same light framing, restrained separators, consistent padding, and compact controls. Phone panels scroll within the visible viewport; the view label and camera toolbar no longer overlap open settings. The time bar is compact.
+
+Immersive fullscreen hides every UI surface except a single exit button, attempts native fullscreen, and retains an in-page fallback where unsupported. Hidden surfaces are inert. Browser verification showed only the scene and exit action exposed in immersive mode; exiting restored normal controls.
+
+Added a relative-scope manifest, safe-zone PNG icons, standalone metadata, explicit install affordance where supported, and a versioned service worker that precaches all 20 application files. Verified the opt-in update/reload flow. With network emulation offline, the app reloaded and the interface displayed all 14,999 asteroid orbits. Networking and viewport overrides were restored after testing. Physical OS installation and real iPhone/Android device tests remain outside this browser QA pass.
+
+Twelve regression checks pass, including icon dimensions, offline navigation/module matching, precache file availability, cache cleanup isolation, and non-GET/cross-origin exclusion. The release check verifies the generated worker matches current source assets.
