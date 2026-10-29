@@ -1750,3 +1750,5 @@ footer {
     display: none;
   }
 }
+/* Avoid ghosted camera buttons behind the transparent desktop settings panel. */
+.settings-open .view-tools{display:none}
