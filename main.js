@@ -445,8 +445,10 @@ gl_FragColor=vec4(color,a*brightness*visibility);}`,
   cloud.frustumCulled = false;
   scene.add(cloud);
   $("#count").textContent = `${n.toLocaleString()} real asteroid orbits loaded`;
-  $("#brightness").oninput = (e) =>
-    (mat.uniforms.brightness.value = +e.target.value);
+  $("#brightness").oninput = (e) => {
+    mat.uniforms.brightness.value = +e.target.value;
+    $("#brightness-value").textContent = (+e.target.value).toFixed(1) + "×";
+  };
   $("#asteroids").onchange = (e) => (cloud.visible = e.target.checked);
 } catch (e) {
   $("#count").textContent = "Asteroid catalogue unavailable";
@@ -510,7 +512,16 @@ function buildDetails() {
   panel.replaceChildren();
   const title = document.createElement("h2");
   title.textContent = o ? o.full_name : "Solar system";
-  panel.append(title);
+  const heading = document.createElement("div");
+  heading.className = "panel-heading";
+  heading.append(title);
+  const close = document.createElement("button");
+  close.className = "panel-close";
+  close.setAttribute("aria-label", "Close object information");
+  close.innerHTML = icon("close");
+  close.onclick = () => setDetails(false);
+  heading.append(close);
+  panel.append(heading);
   const type = document.createElement("p");
   type.className = "detail-caption";
   type.textContent = o
@@ -579,6 +590,7 @@ function buildDetails() {
   }
 }
 function setDetails(open) {
+  document.body.classList.toggle("details-open", open);
   lastBlockerUpdate = 0;
   $("#details").hidden = !open;
   $("#focus-toggle").setAttribute("aria-expanded", String(open));
@@ -588,6 +600,7 @@ function setDetails(open) {
   }
 }
 function setControls(open) {
+  document.body.classList.toggle("settings-open", open);
   lastBlockerUpdate = 0;
   $("#control-panel").hidden = !open;
   $("#settings").setAttribute("aria-expanded", String(open));
@@ -596,6 +609,14 @@ function setControls(open) {
     if (matchMedia("(max-width: 800px)").matches) setExplore(false);
   }
 }
+$("#close-explore").onclick = () => {
+  setExplore(false);
+  $("#explore-toggle").focus();
+};
+$("#close-controls").onclick = () => {
+  setControls(false);
+  $("#settings").focus();
+};
 $("#focus-toggle").onclick = () => setDetails($("#details").hidden);
 buildDetails();
 
@@ -707,17 +728,65 @@ function zoom(factor) {
 }
 $("#zoom-in").onclick = () => zoom(0.7);
 $("#zoom-out").onclick = () => zoom(1.4);
-$("#fullscreen").onclick = () => {
-  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-  else document.documentElement.requestFullscreen?.().catch(() => {});
-};
-if (!document.fullscreenEnabled) $("#fullscreen").hidden = true;
-document.addEventListener("fullscreenchange", () =>
-  $("#fullscreen").setAttribute(
-    "aria-label",
-    document.fullscreenElement ? "Exit fullscreen" : "Enter fullscreen",
+let immersive = false,
+  nativeEntered = false;
+const immersiveUI = [
+  ...document.querySelectorAll(
+    "header,footer,#catalog,#control-panel,.view-meta,.view-tools",
   ),
-);
+];
+function setImmersive(active) {
+  immersive = active;
+  document.body.classList.toggle("immersive", active);
+  lastBlockerUpdate = 0;
+  $("#exit-immersive").hidden = !active;
+  for (const el of immersiveUI)
+    el.inert =
+      active ||
+      (el.id === "catalog" &&
+        document.body.classList.contains("explore-closed"));
+  if (active) {
+    setExplore(false);
+    setDetails(false);
+    setControls(false);
+    $("#exit-immersive").focus();
+  } else {
+    $("#fullscreen").focus();
+  }
+}
+async function enterImmersive() {
+  setImmersive(true);
+  try {
+    if (
+      !document.fullscreenElement &&
+      document.documentElement.requestFullscreen
+    ) {
+      await document.documentElement.requestFullscreen();
+      if (!immersive) await document.exitFullscreen();
+    }
+  } catch {
+    /* Immersive layout is available even when native fullscreen is unavailable. */
+  }
+}
+async function exitImmersive() {
+  setImmersive(false);
+  if (document.fullscreenElement) {
+    try {
+      await document.exitFullscreen();
+    } catch {}
+  }
+  nativeEntered = false;
+}
+$("#fullscreen").onclick = enterImmersive;
+$("#exit-immersive").onclick = exitImmersive;
+document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement) {
+    nativeEntered = true;
+  } else if (nativeEntered) {
+    nativeEntered = false;
+    if (immersive) setImmersive(false);
+  }
+});
 $("#play").onclick = () => {
   paused = !paused;
   $("#play").innerHTML = icon(paused ? "play" : "pause");
@@ -781,12 +850,20 @@ addEventListener("keydown", (e) => {
     return;
   }
   if (e.key === "Escape") {
+    if (immersive) {
+      exitImmersive();
+      return;
+    }
     setExplore(false);
     setDetails(false);
     setControls(false);
     return;
   }
   if (e.target.matches("input,select,textarea")) return;
+  if (immersive) {
+    if (e.key.toLowerCase() === "f") exitImmersive();
+    return;
+  }
   if (e.key === "/") {
     e.preventDefault();
     setExplore(true);
