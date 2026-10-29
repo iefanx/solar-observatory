@@ -1,4 +1,4 @@
-const CACHE_NAME = 'solar-observatory-' + new URL(self.registration.scope).pathname + '-6563a1764d8bce14';
+const CACHE_NAME = 'solar-observatory-' + new URL(self.registration.scope).pathname + '-e97c69ea148be713';
 const PRECACHE = ["app-icons/icon-180.png","app-icons/icon-192.png","app-icons/icon-512.png","assets/asteroid-sprite.png","assets/asteroids.json","assets/earth.jpg","assets/milky-way.jpg","assets/moon.jpg","glow-texture.js","icons.js","index.html","main.js","manifest.webmanifest","orbital-math.js","pwa.js","style.css","vendor/OrbitControls.js","vendor/astronomy.js","vendor/three.module.js","view-state.js"];
 const PREFIX =
   "solar-observatory-" + new URL(self.registration.scope).pathname + "-";
